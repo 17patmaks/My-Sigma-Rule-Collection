@@ -1,0 +1,54 @@
+title: Suspicious PowerShell Web Request to Raw Content Hosting Sites
+id: f9d2e1c4-7b8a-4d3e-9c5f-2a6b8d9e1f3c
+status: test
+description: |
+  Detects PowerShell scripts making web requests to common raw content hosting platforms frequently used by attackers
+  for hosting malicious payloads, C2 scripts, or second-stage malware. Attackers commonly use githubusercontent.com,
+  pastebin.com, paste.ee, hastebin.com, and similar services to host obfuscated PowerShell scripts, shellcode, or
+  configuration files for post-exploitation frameworks like Cobalt Strike, Metasploit, and Empire.
+references:
+  - https://www.microsoft.com/en-us/security/blog/2021/05/27/new-sophisticated-email-based-attack-from-nobelium/
+  - https://www.fortinet.com/blog/threat-research/malicious-use-of-pastebin
+  - https://www.fortinet.com/blog/threat-research/offense-and-defense-a-tale-of-two-sides-powershell
+  - https://isc.sans.edu/diary/25090
+  - https://docs.broadcom.com/doc/increased-use-of-powershell-in-attacks-16-en
+author: Patrick Maksimczuk
+date: 2025-12-10
+modified: 2025-12-10
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.command_and_control
+  - attack.t1102.001
+  - attack.defense_evasion
+  - attack.t1140
+logsource:
+  product: windows
+  category: ps_script
+  definition: 'Requirements: Script Block Logging must be enabled (Event ID 4104)'
+detection:
+  selection_download_cmdlets:
+    ScriptBlockText|contains:
+      - 'Invoke-WebRequest'
+      - 'Invoke-RestMethod'
+      - 'Net.WebClient'
+      - 'DownloadString'
+      - 'DownloadFile'
+      - 'DownloadData'
+      - 'iwr'
+      - 'irm'
+      - 'wget'
+      - 'curl'
+  selection_suspicious_domains:
+    ScriptBlockText|contains:
+      - 'raw.githubusercontent.com'
+      - 'gist.githubusercontent.com'
+      - 'pastebin.com/raw'
+      - 'hastebin.com/raw'
+      - 'ghostbin.co/paste'
+      - 'pastebin.pl/view'
+  condition: all of selection_*
+falsepositives:
+  - Legitimate DevOps automation scripts pulling configurations from GitHub
+  - Administrative scripts using pastebin services for temporary code sharing
+level: medium
