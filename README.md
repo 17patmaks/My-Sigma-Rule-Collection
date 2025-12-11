@@ -1,4 +1,4 @@
-# Collection of Sigma Rules That I Created From things I found interesting
+# Collection of Sigma Rules That I Created From Research I found interesting
 
 ## Overview
 
