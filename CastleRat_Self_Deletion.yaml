@@ -1,0 +1,20 @@
+title: CastleRAT C Malware Self Deletion
+id: 79268bc8-3220-447d-bc7a-02199bed58e9
+status: stable
+description: Detects the execution of powershell by the C variant of CastleRAT malware to delete itself.
+references:
+  - https://tria.ge/251101-lh19hstqft/behavioral2
+author: Insikt Group, Recorded Future
+date: 2025-11-06
+tags:
+  - attack.t1070.004   
+logsource:
+    product: windows
+    category: process_creation
+detection:
+    self_delete:
+        CommandLine|endswith: 'powershell Start-Sleep -Seconds 3; Remove-Item -Path * -Force'
+    condition: self_delete
+level: high
+falsepositives:
+  - Potential benign installer activity
